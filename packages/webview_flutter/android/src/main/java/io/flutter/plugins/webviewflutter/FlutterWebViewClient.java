@@ -4,14 +4,19 @@
 
 package io.flutter.plugins.webviewflutter;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import androidx.annotation.NonNull;
+import androidx.webkit.WebResourceErrorCompat;
 import androidx.webkit.WebViewClientCompat;
 import io.flutter.plugin.common.MethodChannel;
 import java.util.HashMap;
@@ -79,6 +84,14 @@ class FlutterWebViewClient {
     methodChannel.invokeMethod("onPageFinished", args);
   }
 
+  private void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+    Map<String, Object> args = new HashMap<>();
+    args.put("url", failingUrl);
+    args.put("code", errorCode);
+    args.put("description", description);
+    methodChannel.invokeMethod("onReceivedError", args);
+  }
+
   private void notifyOnNavigationRequest(
       String url, Map<String, String> headers, WebView webview, boolean isMainFrame) {
     HashMap<String, Object> args = new HashMap<>();
@@ -124,6 +137,17 @@ class FlutterWebViewClient {
       }
 
       @Override
+      public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+        FlutterWebViewClient.this.onReceivedError(view, errorCode, description, failingUrl);
+      }
+
+      @Override
+      @TargetApi(Build.VERSION_CODES.M)
+      public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+        FlutterWebViewClient.this.onReceivedError(view, error.getErrorCode(), error.getDescription().toString(), request.getUrl().toString());
+      }
+
+      @Override
       public void onUnhandledKeyEvent(WebView view, KeyEvent event) {
         // Deliberately empty. Occasionally the webview will mark events as having failed to be
         // handled even though they were handled. We don't want to propagate those as they're not
@@ -152,6 +176,18 @@ class FlutterWebViewClient {
       @Override
       public void onPageFinished(WebView view, String url) {
         FlutterWebViewClient.this.onPageFinished(view, url);
+      }
+
+      @Override
+      public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+        FlutterWebViewClient.this.onReceivedError(view, errorCode, description, failingUrl);
+      }
+
+      @SuppressLint("RequiresFeature")
+      @Override
+      @TargetApi(Build.VERSION_CODES.M)
+      public void onReceivedError(@NonNull WebView view, @NonNull WebResourceRequest request, @NonNull WebResourceErrorCompat error) {
+        FlutterWebViewClient.this.onReceivedError(view, error.getErrorCode(), error.getDescription().toString(), request.getUrl().toString());
       }
 
       @Override

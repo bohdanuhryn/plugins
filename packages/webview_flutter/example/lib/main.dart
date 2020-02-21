@@ -74,6 +74,9 @@ class _WebViewExampleState extends State<WebViewExample> {
           onPageFinished: (String url) {
             print('Page finished loading: $url');
           },
+          onReceivedError: (int code, String description, String url) {
+            print('Page loading error: $url');
+          },
           gestureNavigationEnabled: true,
         );
       }),
