@@ -10,6 +10,8 @@ import android.hardware.display.DisplayManager;
 import android.os.Build;
 import android.os.Handler;
 import android.view.View;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.WebStorage;
 import android.webkit.WebViewClient;
 import io.flutter.plugin.common.BinaryMessenger;
@@ -28,6 +30,7 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
   private final MethodChannel methodChannel;
   private final FlutterWebViewClient flutterWebViewClient;
   private final Handler platformThreadHandler;
+  private final Context context;
 
   @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
   @SuppressWarnings("unchecked")
@@ -37,6 +40,8 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
       int id,
       Map<String, Object> params,
       View containerView) {
+
+    this.context = context;
 
     DisplayListenerProxy displayListenerProxy = new DisplayListenerProxy();
     DisplayManager displayManager =
@@ -119,6 +124,9 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
   @Override
   public void onMethodCall(MethodCall methodCall, Result result) {
     switch (methodCall.method) {
+      case "setAcceptCookies":
+        setAcceptCookies(methodCall, result);
+        break;
       case "loadUrl":
         loadUrl(methodCall, result);
         break;
@@ -160,6 +168,20 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
         break;
       default:
         result.notImplemented();
+    }
+  }
+
+  private void setAcceptCookies(MethodCall methodCall, Result result) {
+    CookieManager cookieManager = CookieManager.getInstance();
+    boolean accept = false;
+    if (methodCall.argument("accept") != null) {
+      accept = methodCall.argument("accept");
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      cookieManager.setAcceptThirdPartyCookies(webView, accept);
+    } else {
+      CookieSyncManager.createInstance(context);
+      cookieManager.setAcceptCookie(accept);
     }
   }
 

@@ -56,6 +56,14 @@ class MethodChannelWebViewPlatform implements WebViewPlatformController {
   }
 
   @override
+  Future<void> setAcceptCookies(bool accept) {
+    assert(accept != null);
+    return _channel.invokeMethod<void>('setAcceptCookies', <String, dynamic>{
+      'accept': accept
+    });
+  }
+
+  @override
   Future<void> loadUrl(
     String url,
     Map<String, String> headers,

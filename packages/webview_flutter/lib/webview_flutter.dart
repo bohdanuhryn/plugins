@@ -155,7 +155,7 @@ class WebView extends StatefulWidget {
     this.gestureNavigationEnabled = false,
     this.userAgent,
     this.initialMediaPlaybackPolicy =
-        AutoMediaPlaybackPolicy.require_user_action_for_all_media_types,
+        AutoMediaPlaybackPolicy.require_user_action_for_all_media_types
   })  : assert(javascriptMode != null),
         assert(initialMediaPlaybackPolicy != null),
         super(key: key);
@@ -527,6 +527,12 @@ class WebViewController {
   WebSettings _settings;
 
   WebView _widget;
+
+  /// Manages cookies acceptance
+  Future<void> setAcceptCookies(bool accept) async {
+    assert(accept != null);
+    return _webViewPlatformController.setAcceptCookies(accept);
+  }
 
   /// Loads the specified URL.
   ///

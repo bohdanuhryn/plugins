@@ -53,6 +53,7 @@ class _WebViewExampleState extends State<WebViewExample> {
           initialUrl: 'https://flutter.dev',
           javascriptMode: JavascriptMode.unrestricted,
           onWebViewCreated: (WebViewController webViewController) {
+            webViewController.setAcceptCookies(true);
             _controller.complete(webViewController);
           },
           // TODO(iskakaushik): Remove this when collection literals makes it to stable.

@@ -52,6 +52,11 @@ abstract class WebViewPlatformController {
   /// The `handler` parameter must not be null.
   WebViewPlatformController(WebViewPlatformCallbacksHandler handler);
 
+  /// Manages cookies acceptance
+  Future<void> setAcceptCookies(bool accept) {
+      throw UnimplementedError("WebView acceptCookies is not implemented on the current platform");
+  }
+
   /// Loads the specified URL.
   ///
   /// If `headers` is not null and the URL is an HTTP URL, the key value paris in `headers` will
