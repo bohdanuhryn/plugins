@@ -12,7 +12,9 @@ import android.os.Handler;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
+import android.webkit.WebSettings;
 import android.webkit.WebStorage;
+import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
@@ -52,8 +54,31 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
 
     platformThreadHandler = new Handler(context.getMainLooper());
     // Allow local storage.
-    webView.getSettings().setDomStorageEnabled(true);
+    webView.getSettings().setAllowContentAccess(true);
+    webView.getSettings().setAllowFileAccess(true);
+    webView.getSettings().setAllowFileAccessFromFileURLs(true);
+    webView.getSettings().setAllowUniversalAccessFromFileURLs(false);
+    webView.getSettings().setBlockNetworkImage(false);
+    webView.getSettings().setBlockNetworkLoads(false);
+    webView.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
+    webView.getSettings().setDatabaseEnabled(false);
+    webView.getSettings().setGeolocationEnabled(true);
     webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+    webView.getSettings().setLoadsImagesAutomatically(true);
+    webView.getSettings().setNeedInitialFocus(false);
+    webView.getSettings().setSaveFormData(true);
+    webView.getSettings().setSupportMultipleWindows(false);
+    webView.getSettings().setSupportZoom(true);
+
+    webView.getSettings().setDomStorageEnabled(true);
+    webView.getSettings().setAppCacheEnabled(true);
+    webView.getSettings().setJavaScriptEnabled(true);
+    webView.getSettings().setDisplayZoomControls(false);
+    webView.getSettings().setLoadWithOverviewMode(true);
+    webView.getSettings().setUseWideViewPort(true);
+    webView.getSettings().setBuiltInZoomControls(true);
+
+    webView.setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);
 
     methodChannel = new MethodChannel(messenger, "plugins.flutter.io/webview_" + id);
     methodChannel.setMethodCallHandler(this);
